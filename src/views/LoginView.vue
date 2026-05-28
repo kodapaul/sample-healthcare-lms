@@ -2,10 +2,18 @@
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import demoUsers from '../data/demoUsers'
 
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
+
+function useDemoAccount(account) {
+  mode.value = 'signin'
+  email.value = account.email
+  password.value = 'demo'
+  errorMsg.value = ''
+}
 
 // 'signup' = create account, 'signin' = returning user.
 // Honor ?mode=signin (e.g. from the landing "I already have an account" link).
@@ -141,6 +149,25 @@ function handleSubmit() {
           <button type="button" class="footer-link" @click="switchMode('signup')">Create one</button>
         </template>
       </p>
+    </div>
+
+    <div class="demo-panel">
+      <div class="demo-panel__head">
+        <span class="demo-panel__title">Demo accounts</span>
+        <span class="demo-panel__hint">any password works</span>
+      </div>
+      <ul class="demo-list">
+        <li v-for="acct in demoUsers" :key="acct.email">
+          <button type="button" class="demo-acct" @click="useDemoAccount(acct)">
+            <span class="demo-acct__avatar" aria-hidden="true">{{ acct.name.split(' ').map(p => p[0]).join('') }}</span>
+            <span class="demo-acct__text">
+              <span class="demo-acct__name">{{ acct.name }} <span class="demo-acct__role">· {{ acct.role }}</span></span>
+              <span class="demo-acct__email">{{ acct.email }}</span>
+            </span>
+            <span class="demo-acct__use">Use →</span>
+          </button>
+        </li>
+      </ul>
     </div>
 
     <p class="legal subtle">Sample Healthcare LMS · for demonstration only</p>
@@ -292,5 +319,99 @@ function handleSubmit() {
 
 .legal {
   font-size: var(--fs-xs);
+}
+
+/* Demo accounts panel */
+.demo-panel {
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5) var(--space-6);
+}
+.demo-panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+.demo-panel__title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+}
+.demo-panel__hint {
+  font-size: var(--fs-xs);
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-weight: var(--fw-medium);
+}
+.demo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.demo-acct {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-md);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.demo-acct:hover { background: var(--color-surface-muted); }
+.demo-acct:hover .demo-acct__use { color: var(--color-primary); }
+.demo-acct__avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  flex-shrink: 0;
+}
+.demo-acct__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.demo-acct__name {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text);
+}
+.demo-acct__role {
+  color: var(--color-text-muted);
+  font-weight: var(--fw-regular);
+}
+.demo-acct__email {
+  font-size: var(--fs-xs);
+  color: var(--color-text-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.demo-acct__use {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out);
 }
 </style>

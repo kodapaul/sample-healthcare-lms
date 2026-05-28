@@ -1,14 +1,25 @@
 import { defineStore } from 'pinia'
 import { storage } from '../lib/storage'
 import { useProfileStore } from './profile'
+import demoUsers from '../data/demoUsers'
 
 function normalizeEmail(e) {
   return (e ?? '').trim().toLowerCase()
 }
 
+// On first load (or after a reset), seed the demo accounts so reviewers can
+// sign in without creating one. Never clobbers user-created accounts.
+function initUsers() {
+  const existing = storage.loadUsers()
+  if (existing && existing.length > 0) return existing
+  const seeded = demoUsers.map((u) => ({ ...u }))
+  storage.saveUsers(seeded)
+  return seeded
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    users: storage.loadUsers(),
+    users: initUsers(),
     sessionEmail: storage.loadSession()?.email ?? null,
   }),
   getters: {
